@@ -10,6 +10,8 @@ import CardContent from '@material-ui/core/CardContent'
 import Icon from '@material-ui/core/Icon'
 import TextField from '@material-ui/core/TextField'
 import Typography from '@material-ui/core/Typography'
+import Avatar from '@material-ui/core/Avatar'
+import FileUpload from '@material-ui/icons/AddPhotoAlternate'
 
 const useStyles = makeStyles(theme => ({
     card:{
@@ -35,6 +37,17 @@ const useStyles = makeStyles(theme => ({
     submit:{
         margin: 'auto',
         marginBottom: theme.spacing(2)
+    },
+    bigAvatar: {
+        width: 60,
+        height: 60,
+        margin: 'auto'
+      },
+    input: {
+        display: 'none'
+    },
+    filename:{
+        marginLeft:'10px'
     }
 
 }))
@@ -44,8 +57,10 @@ export default function Edit({match}) {
     const [values, setValues] = useState({
         name: '',
         password: '',
+        about: '',
+        photo: '',
         email: '',
-        open: false,
+        id: '',
         error: '',
         redirectToProfile: false
     })
@@ -62,7 +77,7 @@ export default function Edit({match}) {
             if (data && data.error) {
                 setValues({ ...values, error: data.error})
             } else {
-                setValues({ ...values, name: data.name, email: data.email})
+                setValues({ ...values, id:data._id, name: data.name, email: data.email, about: data.about})
             }
         })
         return function cleanup() {
@@ -72,29 +87,37 @@ export default function Edit({match}) {
     }, [match.params.userId])
     
     const clickSubmit = () => {
-        const user = {
-        name: values.name || undefined,
-        email: values.email || undefined,
-        password: values.password || undefined
-        }
+        let userData = new FormData()
+        
+        values.name && userData.append('name', values.name)
+        values.email && userData.append('email', values.email)
+        values.password && userData.append('password', values.password)
+        values.about && userData.append('about', values.about)
+        values.photo && userData.append('photo', values.photo)
+        
         update({
             userId: match.params.userId
-        }, {t: jwt.token}, user).then((data) => {
+        }, {t: jwt.token}, userData).then((data) => {
             if (data && data.error) {
                 setValues({ ...values, error: data.error})
             } else {
-                setValues({ ...values, userId: data._id, redirectToProfile: true})
+                setValues({ ...values, redirectToProfile: true})
             }
         })
     }
 
     const handleChange = name => event => {
-        setValues({ ...values, [name]: event.target.value})
+        const value = name === 'photo' ? event.target.files[0] : event.target.value
+        setValues({ ...values, [name]: value })
     }
-        if (values.redirectToProfile) {
-            return (<Redirect to={"/user/" + values.userId} />)
-        }
-    
+
+    const photoUrl = values.id ? `/api/users/photo/${values.id} ? ${new Date().getTime()}`:
+            '/api/users/defaultphoto'
+
+    if (values.redirectToProfile) {
+        return (<Redirect to={"/user/" + values.Id} />)
+    }
+
     return (
         
         <Card className={classes.card}>
@@ -102,11 +125,30 @@ export default function Edit({match}) {
                 <Typography variant="h6" className={classes.title}>
                     Edit Profile
                 </Typography>
+                <Avatar src={photoUrl} className={classes.bigAvatar} /><br />
+                <input accept="image/*" type="file" 
+                        onChange={handleChange('photo')} style={{display: 'none'}}
+                        id="icon-button-file" />
+                <label htmlFor="icon-button-file">
+                    <Button variant="contained" color="default" component="span">
+                        Upload <FileUpload />
+                    </Button>
+                </label> <span className={classes.filename}>{values.photo ? values.photo.name : ''}</span>
+                <br />
                 <TextField id="name" 
                         label="Name"
                         className={classes.textField}
                         value={values.name}
                         onChange={handleChange('name')}
+                        margin="normal" 
+                /><br />
+                <TextField id="multiline-flexible" 
+                        label="About"
+                        multiline
+                        rows="2"
+                        className={classes.textField}
+                        value={values.about}
+                        onChange={handleChange('about')}
                         margin="normal" 
                 /><br />
                 <TextField id="email" 
@@ -137,7 +179,8 @@ export default function Edit({match}) {
             </CardContent>
             <CardActions>
                 <Button color="primary" variant="contained" onClick={clickSubmit}
-                        className={classes.submit}>Update profile
+                        className={classes.submit}>
+                    Update profile
                 </Button>
             </CardActions>
         </Card>
