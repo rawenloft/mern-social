@@ -1,4 +1,5 @@
 import express from 'express'
+import path from 'path'
 import cookieParser from 'cookie-parser'
 import compress from 'compression'
 import cors from 'cors'
@@ -6,7 +7,6 @@ import helmet from 'helmet'
 import Template from './../template'
 import userRoutes from './routes/user.routes'
 import authRoutes from './routes/auth.routes'
-import path from 'path'
 import devBundle from './devBundle' //Закомментировать для продакшена
 
 // Modules for server-side rendering
