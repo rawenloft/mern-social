@@ -16,6 +16,7 @@ import Edit from '@material-ui/icons/Edit'
 import Person from '@material-ui/icons/Person'
 import { Link, Redirect } from 'react-router-dom'
 import DeleteUser from './DeleteUser'
+import FollowProfileButton from './FollowProfileButton'
 
 const useStyles = makeStyles(theme => ({
     root: theme.mixins.gutters({
@@ -59,13 +60,33 @@ export default function Profile({ match }) {
                 console.log(data)
                 setValues({ ...values, redirectToSignin: true})
             } else {
-                setValues({...values, user: data})
+                let following = checkFollow(data)
+                setValues({...values, user: data, following: following})
             }
         })
         return function cleanup() {
             abortController.abort()
         }
     }, [match.params.userId])
+
+    const checkFollow = (user) => {
+        const match = user.followers.some((follower) => {
+            return follower._id ==jwt.user._id
+        })
+        return match
+    }
+
+    const clickFollowButton = (callApi) => {
+        callApi({
+            userId: jwt.user._id
+        }, {t: jwt.token}, values.user._id).then((data) => {
+            if (data.error) {
+                setValues({ ...values, error: data.error})
+            } else {
+                setValues({ ...values, user: data, following: !values.following})
+            }
+        })
+    }
 
     const photoUrl = values.user._id 
             ? `/api/users/photo/${values.user._id}?${new Date().getTime()}`
@@ -99,11 +120,7 @@ export default function Profile({ match }) {
                             </Link>
                             <DeleteUser userId={values.user._id} />
                         </ListItemSecondaryAction>)
-                        : (<ListItemAvatar>
-                            <Avatar src={photoUrl} className={classes.bigAvatar}>
-                                <Person />
-                            </Avatar>
-                        </ListItemAvatar>)
+                        : (<FollowProfileButton following={values.following} onButtonClick={clickFollowButton} />)
                     }
                 </ListItem>
                 <Divider />
