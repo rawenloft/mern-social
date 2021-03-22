@@ -15,16 +15,13 @@ export default function FollowProfileButton (props) {
 
     return (<div>
         {props.following 
-            ? (<Button variant="contained" color="secondary" onClick={unfollowClick}>
-                Unfollow
-            </Button>) : (<Button variant="contained" color="primary" onClick={followClick}>
-                Follow
-            </Button>)
+            ? (<Button variant="contained" color="secondary" onClick={unfollowClick}>Unfollow</Button>) 
+            : (<Button variant="contained" color="primary" onClick={followClick}>Follow</Button>)
         }
     </div>)
 }
 
 FollowProfileButton.propTypes = {
-    following: PropTypes.bool.isReqired,
-    onButtonClick: PropTypes.func.isReqired
-}
+    following: PropTypes.bool.isRequired,
+    onButtonClick: PropTypes.func.isRequired
+  }

@@ -79,7 +79,7 @@ const follow = async (params, credentials, followId) => {
     try {
       let response = await fetch('/api/users/follow/',{
           method: 'PUT',
-          headers:{
+          headers: {
               'Accept': 'application/json',
               'Content-Type': 'application/json',
               'Authorization': 'Bearer ' + credentials.t

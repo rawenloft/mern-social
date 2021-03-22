@@ -17,6 +17,7 @@ import Person from '@material-ui/icons/Person'
 import { Link, Redirect } from 'react-router-dom'
 import DeleteUser from './DeleteUser'
 import FollowProfileButton from './FollowProfileButton'
+import FollowGrid from './FollowGrid'
 
 const useStyles = makeStyles(theme => ({
     root: theme.mixins.gutters({
@@ -71,7 +72,7 @@ export default function Profile({ match }) {
 
     const checkFollow = (user) => {
         const match = user.followers.some((follower) => {
-            return follower._id ==jwt.user._id
+            return follower._id == jwt.user._id
         })
         return match
     }
@@ -111,15 +112,15 @@ export default function Profile({ match }) {
                                 secondary={values.user.email}
                     />
                     { auth.isAuthenticated().user &&
-                        auth.isAuthenticated().user._id == values.user._id ?
-                        (<ListItemSecondaryAction>
-                            <Link to={"/user/edit/" + values.user._id}>
-                                <IconButton aria-label="Edit" color="primary">
-                                    <Edit />
-                                </IconButton>
-                            </Link>
-                            <DeleteUser userId={values.user._id} />
-                        </ListItemSecondaryAction>)
+                            auth.isAuthenticated().user._id == values.user._id 
+                        ? (<ListItemSecondaryAction>
+                                <Link to={"/user/edit/" + values.user._id}>
+                                    <IconButton aria-label="Edit" color="primary">
+                                        <Edit />
+                                    </IconButton>
+                                </Link>
+                                <DeleteUser userId={values.user._id} />
+                            </ListItemSecondaryAction>)
                         : (<FollowProfileButton following={values.following} onButtonClick={clickFollowButton} />)
                     }
                 </ListItem>
@@ -128,6 +129,7 @@ export default function Profile({ match }) {
                     <ListItemText primary={values.user.about} secondary={"Joined: " + (new Date(values.user.created)).toDateString()} />
                 </ListItem>
             </List>
+            <FollowGrid people={values.user.following} />
         </Paper>
     )
 }

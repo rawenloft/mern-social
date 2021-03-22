@@ -101,7 +101,7 @@ export default function Edit({match}) {
             if (data && data.error) {
                 setValues({ ...values, error: data.error})
             } else {
-                setValues({ ...values, redirectToProfile: true})
+                setValues({ ...values, 'redirectToProfile': true})
             }
         })
     }

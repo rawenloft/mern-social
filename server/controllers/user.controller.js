@@ -55,6 +55,7 @@ const read = (req, res) => {
     req.profile.salt = undefined
     return res.json(req.profile)
 }
+
 const update = async (req, res) => {
     let form = new formidable.IncomingForm()
     form.keepExtensions = true
@@ -111,8 +112,7 @@ const defaultPhoto = (req,res) => {
 
 const addFollowing = async (req,res, next) => {
     try {
-        await User.findByIdAndUpdate(req.body.userId,
-            {$push: {following: req.body.followId}})
+        await User.findByIdAndUpdate(req.body.userId, {$push: {following: req.body.followId}})
         next()
     } catch (err) {
         return res.status(400).json({
@@ -123,8 +123,7 @@ const addFollowing = async (req,res, next) => {
 
 const addFollower = async (req,res) => {
     try {
-        let result = await User.findByIdAndUpdate(req.body.followId,
-            {$push: {followers: req.body.userId}},
+        let result = await User.findByIdAndUpdate(req.body.followId, {$push: {followers: req.body.userId}},
             {new: true})
             .populate('following', '_id name')
             .populate('followers', '_id name')
@@ -141,8 +140,7 @@ const addFollower = async (req,res) => {
 
 const removeFollowing = async (req, res, next) => {
     try {
-        await User.findByIdAndUpdate(req.body.userId,
-            {$pull: {following: req.body.unfollowId}})
+        await User.findByIdAndUpdate(req.body.userId, {$pull: {following: req.body.unfollowId}})
         next()
     } catch (err) {
         return res.status(400).json({
@@ -153,12 +151,11 @@ const removeFollowing = async (req, res, next) => {
 
 const removeFollower = async (req, res) => {
     try {
-        let result = await User.findByIdAndUpdate(req.body.userId, 
-            {$pull: {followers: req.body.userId}},
+        let result = await User.findByIdAndUpdate(req.body.unfollowId, {$pull: {followers: req.body.userId}},   
             {new: true})
-                .populate('following', '_id name')
-                .populate('followers', '_id name')
-                .exec()
+            .populate('following', '_id name')
+            .populate('followers', '_id name')
+            .exec()
         result.hashed_password = undefined
         result.salt = undefined
         res.json(result)
@@ -180,4 +177,4 @@ export default { create,
                 addFollower,
                 addFollowing,
                 removeFollower,
-                removeFollowing}
+                removeFollowing }

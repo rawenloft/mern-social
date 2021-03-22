@@ -51,7 +51,9 @@ export default function Signup() {
         password: '',
         email: '',
         open: false,
-        error: ''
+        error: '',
+        photo: '',
+        about: ''
     })
 
     const handleChange = name => event => {
