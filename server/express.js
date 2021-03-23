@@ -7,6 +7,7 @@ import helmet from 'helmet'
 import Template from './../template'
 import userRoutes from './routes/user.routes'
 import authRoutes from './routes/auth.routes'
+import postRoutes from './routes/post.routes'
 import devBundle from './devBundle' //Закомментировать для продакшена
 
 // Modules for server-side rendering
@@ -43,6 +44,7 @@ app.use('/dist', express.static(path.join(CURRENT_WORKING_DIR, 'dist')))
 // Mounts routes
 app.use('/', userRoutes)
 app.use('/', authRoutes)
+app.use('/', postRoutes)
 
 app.get('*', (req, res) => {
     const sheets = new ServerStyleSheets()

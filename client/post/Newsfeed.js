@@ -6,6 +6,7 @@ import Typography from '@material-ui/core/Typography'
 import Divider from '@material-ui/core/Divider'
 import NewPost from './NewPost'
 import PostList from './PostList'
+import { listNewsFeed } from './api-post'
 
 
 const useStyles = makeStyles(theme => ({
@@ -34,7 +35,16 @@ export default function Newsfeed() {
         const abortController = new AbortController()
         const signal = abortController.signal
 
-
+        listNewsFeed({userId: jwt.user._id}, {t: jwt.token}, signal).then((data) => {
+            if (data.error) {
+                console.log(data.error)
+            } else {
+                setPosts(data)
+            }
+        })
+        return function cleanup(){
+            abortController.abort()
+        }
     },[])
 
     const addPost = (post) => {
