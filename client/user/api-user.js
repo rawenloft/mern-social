@@ -111,7 +111,7 @@ const unfollow = async (params, credentials, unfollowId) => {
 
 const findPeople = async (params, credentials, signal) => {
     try {
-        let response = await fetch('api/users/findpeople/' + params.userId, {
+        let response = await fetch('/api/users/findpeople/' + params.userId, {
             method: 'GET',
             signal: signal,
             headers: {

@@ -30,7 +30,7 @@ const useStyles = makeStyles(theme => ({
       marginRight: theme.spacing(1)
     },
     follow: {
-      right: theme.spacing(2)
+      right: theme.spacing(1)
     },
     snack: {
       color: theme.palette.protectedTitle
@@ -49,15 +49,19 @@ export default function FindPeople() {
     })
     const jwt = auth.isAuthenticated()
 
-    useEffect(()=>{
+    useEffect(() => {
         const abortController = new AbortController()
         const signal = abortController.signal
 
-        findPeople({userId: jwt.user._id}, {t: jwt.token},signal).then((data) => {
+        findPeople({
+          userId: jwt.user._id
+        }, {
+          t: jwt.token
+        }, signal).then((data) => {
             if (data && data.error){
                 console.log(data.error)
             } else {
-                setValues({...values, users: data})
+                setValues({...values, users:data})
             }
         })
         return function cleanup() {
@@ -92,11 +96,11 @@ export default function FindPeople() {
               return <span key={i}>
                 <ListItem>
                   <ListItemAvatar className={classes.avatar}>
-                    <Avatar src={'/api/users/photo' + item._id} />
+                    <Avatar src={'/api/users/photo/' + item._id} />
                   </ListItemAvatar>
                   <ListItemText primary={item.name} />
                   <ListItemSecondaryAction className={classes.follow}>
-                    <Link to={'/user/' + item._id}>
+                    <Link to={"/user/" + item._id}>
                       <IconButton variant="contained" color="secondary" className={classes.viewButton}>
                         <ViewIcon />
                       </IconButton>

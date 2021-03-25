@@ -17,7 +17,8 @@ import Person from '@material-ui/icons/Person'
 import { Link, Redirect } from 'react-router-dom'
 import DeleteUser from './DeleteUser'
 import FollowProfileButton from './FollowProfileButton'
-import FollowGrid from './FollowGrid'
+import {listByUser} from './../post/api-post'
+import ProfileTabs from './../user/ProfileTabs'
 
 const useStyles = makeStyles(theme => ({
     root: theme.mixins.gutters({
@@ -46,7 +47,7 @@ export default function Profile({ match }) {
         redirectToSignin: false,
         following: false
     })
-    
+    const [posts, setPosts] = useState([])
 
     const jwt = auth.isAuthenticated()
 
@@ -58,11 +59,11 @@ export default function Profile({ match }) {
             userId: match.params.userId
         }, {t: jwt.token}, signal).then((data) => {
             if (data && data.error) {
-                console.log(data)
                 setValues({ ...values, redirectToSignin: true})
             } else {
                 let following = checkFollow(data)
                 setValues({...values, user: data, following: following})
+                loadPosts(data._id)
             }
         })
         return function cleanup() {
@@ -89,6 +90,25 @@ export default function Profile({ match }) {
         })
     }
 
+    const loadPosts = (user) => {
+        listByUser({
+            userId: user
+        }, {t: jwt.token}).then((data) => {
+            if (data.error) {
+                console.log(data.error)
+            } else {
+                setPosts(data)
+            }
+        })
+    }
+
+    const removePost = (post) => {
+        const updatedPosts = posts
+        const index = updatedPosts.indexOf(post)
+        updatedPosts.splice(index, 1)
+        setPosts(updatedPosts)
+    }
+
     const photoUrl = values.user._id 
             ? `/api/users/photo/${values.user._id}?${new Date().getTime()}`
             : '/api/users/defaultphoto'
@@ -108,11 +128,8 @@ export default function Profile({ match }) {
                             <Person />
                         </Avatar>
                     </ListItemAvatar>
-                    <ListItemText primary={values.user.name}
-                                secondary={values.user.email}
-                    />
-                    { auth.isAuthenticated().user &&
-                            auth.isAuthenticated().user._id == values.user._id 
+                    <ListItemText primary={values.user.name} secondary={values.user.email}/>{
+                         auth.isAuthenticated().user && auth.isAuthenticated().user._id == values.user._id 
                         ? (<ListItemSecondaryAction>
                                 <Link to={"/user/edit/" + values.user._id}>
                                     <IconButton aria-label="Edit" color="primary">
@@ -129,7 +146,7 @@ export default function Profile({ match }) {
                     <ListItemText primary={values.user.about} secondary={"Joined: " + (new Date(values.user.created)).toDateString()} />
                 </ListItem>
             </List>
-            <FollowGrid people={values.user.following} />
+            <ProfileTabs user={values.user} posts={posts} removePostUpdate={removePost} />
         </Paper>
     )
 }

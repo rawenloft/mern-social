@@ -35,7 +35,9 @@ export default function Newsfeed() {
         const abortController = new AbortController()
         const signal = abortController.signal
 
-        listNewsFeed({userId: jwt.user._id}, {t: jwt.token}, signal).then((data) => {
+        listNewsFeed({
+            userId: jwt.user._id
+        }, {t: jwt.token}, signal).then((data) => {
             if (data.error) {
                 console.log(data.error)
             } else {
@@ -58,6 +60,12 @@ export default function Newsfeed() {
         updatedPosts.splice(index, 1)
         setPosts(updatedPosts)
     }
+    const updatePost = (newPost, index) => {
+        const updatedPosts = [...posts]
+        updatedPosts[index] = newPost
+        setPosts(updatedPosts)
+    }
+
     return (
         <Card className={classes.card}>
             <Typography type="title" className={classes.title}>
